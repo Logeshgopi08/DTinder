@@ -1,40 +1,40 @@
 const express = require("express");
 const { AdminAuth } = require("./middlewares/auth");
+const connectDb = require("./config/database");
+const User = require("./models/user");
+const { Types } = require("mongoose");
 
 const app = express();
 
-app.use("/",(err,req,res,next)=>{
-    if(err)
-    {res.status(404).send("Sorry,Something went Wrong:404 Error");}
-    
-});
+app.post('/signup', async(req,res)=>{
 
+    //This is instance of the User Model
+    const users = new User({
+        firstName:"vijay",
+        lastName:"Thalapathy",
+        emailID:"thalapathy.com",
+        password:"1224387"
+    });
 
-app.use("/admin",AdminAuth);
-
-app.use("/user",(req,res,next)=>{
-    console.log("user router is clicked");
-    
-    res.send("user router ");
+    try {
+        await users.save();
+        res.send("User created Successfully!!");
+    } catch (error) {
+        res.send("Something went Wrong"+ error)
+    }
 })
 
-app.use("/admin/getData",(req,res,next)=>{
-    throw new Error("j,bdih");
-    res.send("Data is here");
-});
-
-app.use("/admin/userdata",(req,res,next)=>{
-    res.send("userDAta is here");
-});
-
-app.use("/",(err,req,res,next)=>{
-    if(err)
-    {res.status(404).send("Sorry,Something went Wrong:404 Error");}
+connectDb().then(()=>{
+    console.log("Database is connected");
+    
+    app.listen(3500,()=>{
+        console.log("Server is listening on 3500.. ");
+        
+    });
+}).catch((err)=>{
+    console.log("Database is Not connected");
+    console.log(err);
     
 });
 
 
-app.listen(3500,()=>{
-    console.log("Server is listening on 3500.. ");
-    
-})
