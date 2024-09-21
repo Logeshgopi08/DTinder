@@ -3,16 +3,29 @@ const { AdminAuth } = require("./middlewares/auth");
 const connectDb = require("./config/database");
 const User = require("./models/user");
 const { Types } = require("mongoose");
+const { validateSignUpData } = require("./utlis/validation");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  //This is instance of the User Model
-  const users = new User(req.body);
-
   try {
+    validateSignUpData(req);
+
+    const { firstName, lastName, emailID, password } = req.body;
+
+    const passwordhash = await bcrypt.hash(password, 10);
+
+    //This is instance of the User Model
+    const users = new User({
+      firstName,
+      lastName,
+      emailID,
+      password:passwordhash,
+    });
+
     await users.save();
     res.send("User created Successfully!!");
   } catch (error) {
@@ -60,8 +73,8 @@ app.patch("/updateUser/:userid", async (req, res) => {
       ALLOWEDUPDATES.includes(k)
     );
 
-    if(!isUpdated){
-        throw new Error("something went wrong");
+    if (!isUpdated) {
+      throw new Error("something went wrong");
     }
 
     // if(!data.skills.length<10){
