@@ -16,14 +16,14 @@ requestRouter.post("/request/send/:status/:toUserId", UserAuth, async (req, res)
         const allowedStatus = ["interested","ignored"];
 
         if(!allowedStatus.includes(status)){
-          res.status(400).json({message:"Invalid Status Type "+ status});
+          return  res.status(400).json({message:"Invalid Status Type "+ status});
         };
 
         const toUser = await User.findById(toUserId);
         console.log(toUser);
         
         if(!toUser){
-          res.status(400).json({message:"User Not Found"});
+         return res.status(400).json({message:"User Not Found"});
         };
 
         const existingConnection = await ConnectionRequest.findOne({
@@ -34,7 +34,7 @@ requestRouter.post("/request/send/:status/:toUserId", UserAuth, async (req, res)
         });
 
         if(existingConnection){
-          res.status(400).json({message:"Connection Request Already Send !!"});
+         return res.status(400).json({message:"Connection Request Already Send !!"});
         }
 
         const connectionRequest = new ConnectionRequest({
